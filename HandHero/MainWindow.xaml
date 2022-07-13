@@ -4,9 +4,100 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HandHero"
+        xmlns:convert="clr-namespace:HandHero.Converters"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="1000" Width="1000" >
+    <Window.Resources>
+        <convert:FifthScale x:Key="FifthScale"></convert:FifthScale>
+    </Window.Resources>
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="*"/>
+
+        </Grid.ColumnDefinitions >
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="50*"/>
+                <RowDefinition Height="Auto"/>
+
+            </Grid.RowDefinitions>
+            <Grid Height="50" Background="Aqua"> </Grid>
+            <Grid  Grid.Row="1" Name="MainScreen">
+    
+           
+                <Grid>
+          
+                    <Viewbox   Stretch="Uniform" HorizontalAlignment="Center" >
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Border  BorderBrush="Black" BorderThickness="3">
+                                <Grid >
+                                    <Image Name="MainGameView"  Width="640" Height="480" Stretch="Fill" Source="./Assets/Images/NoImage.jpg"></Image>
+                                    <Grid  Name="Table"  Height="{Binding Path=Height , ElementName=MainGameView}" Width="{Binding Path=Width , ElementName=MainGameView}" MouseMove="MouseMove" />
+                      
+                                </Grid>
+                              
+                           
+                            </Border>
+                            <Grid Height="{Binding Path=Height, ElementName=MainGameView, Converter={StaticResource FifthScale}}" Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions >
+                                <Border  Grid.Column="0" Height="400" Name="RedBox" BorderThickness="4" BorderBrush="Black"  Width="{Binding Path=Width, ElementName=MainGameView,Converter={StaticResource FifthScale}}" Background="Red" />
+                                <Border  Grid.Column="1" Height="400" Name="BlueBox" BorderThickness="4" BorderBrush="Black"  Width="{Binding Path=Width, ElementName=MainGameView,Converter={StaticResource FifthScale}}" Background="Blue" />
+                                <Border  Grid.Column="2" Height="400" Name="GreenBox" BorderThickness="4" BorderBrush="Black"  Width="{Binding Path=Width, ElementName=MainGameView,Converter={StaticResource FifthScale}}" Background="Green" />
+                                <Border  Grid.Column="3" Height="400" Name="YellowBox" BorderThickness="4" BorderBrush="Black" Width="{Binding Path=Width, ElementName=MainGameView,Converter={StaticResource FifthScale}}" Background="Yellow" />
+                                <Border  Grid.Column="4" Height="400" Name="PinkBox" BorderThickness="4" BorderBrush="Black" Width="{Binding Path=Width, ElementName=MainGameView,Converter={StaticResource FifthScale}}" Background="Pink" />
+                            </Grid>
+                        </Grid>
+             
+                      
+                    </Viewbox>
+          
+                </Grid>
+              
+                
+            </Grid>
+            <Grid Height="50" Background="Aqua" Grid.Row="2"></Grid>
+           
+        </Grid>
+        
+        <!--#region cameras view  -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Border BorderThickness="4" BorderBrush="Black">
+                <Image Grid.Row="0" Source="./Assets/Images/NoImage.jpg" Stretch="Fill"></Image>
+            </Border>
+            <Border  Grid.Row="1" BorderThickness="4" BorderBrush="Black">
+                <Image Source="./Assets/Images/NoImage.jpg" Stretch="Fill"></Image>
+            </Border>
+            <Border  Grid.Row="2" BorderThickness="4" BorderBrush="Black">
+                <Image Source="./Assets/Images/NoImage.jpg" Stretch="Fill"></Image>
+            </Border>
+            <Border Grid.Row="3" BorderThickness="4" BorderBrush="Black">
+                <Image  Source="./Assets/Images/NoImage.jpg" Stretch="Fill"></Image>
+            </Border>
+            <Border   Grid.Row="4" BorderThickness="4" BorderBrush="Black">
+                <Label Name="Data" Content="DATA"> </Label>
+            </Border>
+        </Grid>
+        <!--#endregion-->
+ 
 
     </Grid>
 </Window>
