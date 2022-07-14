@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Media;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -24,108 +25,127 @@ namespace HandHero
     /// </summary>
     public partial class MainWindow : Window
     {
-        private MediaPlayer mediaPlayer = new MediaPlayer();
-
+        [DllImport("kernel32.dll", SetLastError = true)]
+        static extern bool Beep(uint dwFreq, uint dwDuration);
+        private readonly Border []  tagToBox ; 
+        private Point lastPoint = new Point(0, 0); 
         private const int TableRows = 20, TableCols = 20;
         private const int NumberOfColors = 5;
         private readonly Brush[] colors = { Brushes.Red, Brushes.Blue, Brushes.Green, Brushes.Yellow , Brushes.Pink };
         private readonly Border[,] TableArray = new Border[TableRows, TableCols];
-        private int ? lastCol =null ,  lastRow =null; 
-        private void MouseMove(object sender, MouseEventArgs e)
-        {
-            
-            Grid senderG = ((Grid)sender); 
-            Point pos = e.GetPosition(this);
-            Point startingPoint = senderG.TranslatePoint(new Point(0, 0), this); 
-            double Width = senderG.Width , Height = senderG.Height;
-
-            #region DataDisplay 
-            Data.Content = pos;
-            Data.Content += "\n" + senderG.TranslatePoint(new Point(0, 0), this);
-            Data.Content += "\n" + senderG.Width + "\n" + senderG.Height;
-            #endregion
-
-            double colSize = Width / MainWindow.TableCols , rowSize = Height / MainWindow.TableRows;
-
-            uint col = Math.Min((uint)((pos.X - startingPoint.X) / colSize -1 ), TableCols-1), 
-                row = Math.Min((uint)((pos.Y - startingPoint.Y) / rowSize - 1), TableRows-1);
-
-            Data.Content += "\ncol: " + col + "\nrow : " + row;
-            if (TableArray[row, col].Background == null) {
-                TableArray[row, col].Background = TableArray[row, col].BorderBrush;
-            }
-             
-
-
-       
+        private Border lastBorder = null;
+        uint currentBeamIndex = 0;
+        private readonly Random rndGen = new Random(); 
+        List<Rectangle> enemies =new List<Rectangle>();
+        int shots = 0, misses = 0; 
         
-        
-        
-        }
 
-
-  
 
 
         public MainWindow()
         {
             InitializeComponent();
-
-           
-            for (int i = 0; i < TableRows; i++ )
-            { 
+            tagToBox =new Border[5] { RedBox , BlueBox ,GreenBox , YellowBox ,PinkBox} ;
+            #region TableReset 
+            for (int i = 0; i < TableRows; i++)
+            {
 
                 for (int k = 0; k < NumberOfColors; k++)
                 {
                     for (int j = 0; j < TableCols / NumberOfColors; j++)
-                {
-                     
-                            Border brd = new Border();
-                            brd.BorderThickness = new Thickness(1);
-                            brd.BorderBrush = colors[k];
-                            TableArray[i,k * (TableCols / NumberOfColors) + j ] = brd;
+                    {
+
+                        Border brd = new Border();
+                        brd.BorderThickness = new Thickness(1);
+                        brd.BorderBrush = colors[k];
+                        brd.Tag = k;
+                        brd.MouseMove += (sender, e) => {
+                            Border BSender = (Border)sender;
+                            BSender.Background = Brushes.Orange;
+                            if (lastBorder is UIElement)
+                            {
+                                lastBorder.Background = null;
+                                tagToBox[(int)lastBorder.Tag].Background = colors[(int)lastBorder.Tag];
+                            }
+                            this.lastBorder = BSender;
+                            tagToBox[(int)BSender.Tag].Background = Brushes.GhostWhite;
+                            this.currentBeamIndex = (uint)((int) BSender.Tag);
+
+                        };
+                        TableArray[i, k * (TableCols / NumberOfColors) + j] = brd;
 
 
-                        
+
                     }
-                  
+
                 }
-               
+
             }
-            
+            #endregion
+
+            #region EnemyTimer 
+            DispatcherTimer timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromSeconds(0.03);
+            timer.Tick += EnemyCreation;
+            timer.Start();
+            #endregion
+
             Table.Children.Add(new CostumTable(TableRows, TableCols, TableArray));
 
        
-              mediaPlayer.Open(new Uri(@"https://file-examples.com/storage/fef3ae9ac162ce030988192/2017/11/file_example_MP3_2MG.mp3"));
-
-            DispatcherTimer timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(1);
-            timer.Tick += timer_Tick;
-            timer.Start();
-             mediaPlayer.Play();
+       
         }
-
-        void timer_Tick(object sender, EventArgs e)
+        void EnemyCreation(object sender, EventArgs e)
         {
-            if (mediaPlayer.Source != null)
-                Data.Content = mediaPlayer.Volume; 
-            else
-                Data.Content = "No file selected...";
+            double width = MainGameView.ActualWidth, height = MainGameView.ActualHeight;
+            for (int i = 0; i < tagToBox.Length; i++) {
+                tagToBox[i].Background = colors[i];
+            }
+            int beamOfEnemy = 0;
+            do {
+                beamOfEnemy = rndGen.Next(5);
+            } while (enemies.Any(e => Canvas.GetLeft(e) == beamOfEnemy * width / MainWindow.NumberOfColors && Canvas.GetTop(e) <= (height / MainWindow.TableRows ) ));
+           
+            Data.Content = beamOfEnemy;
+
+            Rectangle enemy = new Rectangle() ;
+            enemy.Width = width / MainWindow.NumberOfColors; 
+            enemy.Height = height / MainWindow.TableRows * NumberOfColors /2 ;
+            enemy.Fill = colors[beamOfEnemy];
+            enemy.Tag = beamOfEnemy; 
+            Canvas.SetLeft(enemy, beamOfEnemy * width / MainWindow.NumberOfColors);
+            Canvas.SetTop(enemy,0);
+
+            MainRail.Children.Add(enemy);
+            for(int i = 0;  i<enemies.Count; i++)
+            {
+                var enemyToMove = enemies[i];
+                double posY = Canvas.GetTop(enemyToMove) + height / MainWindow.TableRows ;
+                Canvas.SetTop(enemyToMove, posY );
+                if (posY > height)
+                {
+                  
+                    enemies[i] = null; 
+                    MainRail.Children.Remove(enemyToMove);
+                    if (currentBeamIndex == (int)enemyToMove.Tag)
+                    {
+                        tagToBox[(int)enemyToMove.Tag].Background = Brushes.LawnGreen;
+                        shots++; 
+
+                    }
+                    else {
+                        tagToBox[(int)enemyToMove.Tag].Background = Brushes.Black;
+                        misses++; 
+                    }
+                      
+                }                
+            }
+            enemies = enemies.FindAll(e => !(e is null)); 
+            enemies.Add(enemy);
+            Data.Content = shots + @"\" + (misses + shots); 
+
         }
 
-        private void btnPlay_Click(object sender, RoutedEventArgs e)
-        {
-            mediaPlayer.Play();
-        }
 
-        private void btnPause_Click(object sender, RoutedEventArgs e)
-        {
-            mediaPlayer.Pause();
-        }
-
-        private void btnStop_Click(object sender, RoutedEventArgs e)
-        {
-            mediaPlayer.Stop();
-        }
     }
 } 
