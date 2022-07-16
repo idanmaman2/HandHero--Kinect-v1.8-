@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HandHero"
-        xmlns:convert="clr-namespace:HandHero.Converters"
+        xmlns:convert="clr-namespace:HandHero.Converters" xmlns:widgets="clr-namespace:Microsoft.Samples.Kinect.DepthBasics.Widgets"
         mc:Ignorable="d"
         Title="MainWindow" Height="1000" Width="1000" 
         Background="#FF292828"
@@ -76,10 +76,12 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
     </Window.Resources>
     <Grid>
-       
+
         <Grid.ColumnDefinitions>
+            
             <ColumnDefinition Width="3*"/>
             <ColumnDefinition Width="*"/>
 
@@ -91,12 +93,12 @@
                 <RowDefinition Height="Auto"/>
 
             </Grid.RowDefinitions>
-            <Grid Height="50" Background="Aqua"> </Grid>
+            <Grid Height="50" Background="Aqua"></Grid>
             <Grid  Grid.Row="1" Name="MainScreen">
-    
-           
+
+
                 <Grid>
-          
+
                     <Viewbox   Stretch="Uniform" HorizontalAlignment="Center" >
                         <Grid>
                             <Grid.RowDefinitions>
@@ -105,15 +107,22 @@
                             </Grid.RowDefinitions>
                             <Border  BorderBrush="Black" BorderThickness="3">
                                 <Grid >
-                                    <Image Name="MainGameView"  Width="640" Height="480" Stretch="Fill" Source="./Assets/Images/NoImage.jpg"></Image>
-                                    <Grid  Name="Table"  Height="{Binding Path=Height , ElementName=MainGameView}" Width="{Binding Path=Width , ElementName=MainGameView}"  />
-                                    <Canvas Name="MainRail">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="21*"/>
+                                        <ColumnDefinition Width="43*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Image Name="MainGameView"  Width="640" Height="480" Stretch="Fill" Source="./Assets/Images/NoImage.jpg" Grid.ColumnSpan="2"></Image>
+                                    <Grid  Name="Table"  Height="{Binding Path=Height , ElementName=MainGameView}" Width="{Binding Path=Width , ElementName=MainGameView}" Grid.ColumnSpan="2"  />
+                                    <Canvas Name="MainRail" Grid.ColumnSpan="2">
                                         <Ellipse Name="Mouse" Fill="DarkOrange"  Width="50" Height="50"  />
                                         <Ellipse Name="Mouse2" Fill="RosyBrown"  Width="20" Height="20" Canvas.Left="15" Canvas.Top="15"  />
+
                                     </Canvas>
+
                                 </Grid>
-                              
-                           
+
+
                             </Border>
                             <Grid Height="{Binding Path=Height, ElementName=MainGameView, Converter={StaticResource FifthScale}}" Grid.Row="1">
                                 <Grid.ColumnDefinitions>
@@ -130,20 +139,20 @@
                                 <Border  Grid.Column="4" Height="200" Name="PinkBox" BorderThickness="4" BorderBrush="Black" Width="{Binding Path=Width, ElementName=MainGameView,Converter={StaticResource FifthScale}}" Background="Pink" />
                             </Grid>
                         </Grid>
-             
-                      
+
+
                     </Viewbox>
-          
+
                 </Grid>
-              
-                
+
+
             </Grid>
             <ProgressBar Name ="Rate" Grid.Row="2" Background="WhiteSmoke" Value="50" Height="50" Width="{Binding Path=Width, ElementName=MainScreen}" >
-            
+
             </ProgressBar>
 
         </Grid>
-        
+
         <!--#region cameras view  -->
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
@@ -155,7 +164,14 @@
             </Grid.RowDefinitions>
             <Border BorderThickness="4,4,4,2" BorderBrush="Black">
                 <Grid>
-                    <Image Name="DepthImage"  Source="./Assets/Images/NoImage.jpg" Stretch="Fill"></Image>
+                    <Grid>
+                        <Image Name="DepthImage"  Source="./Assets/Images/NoImage.jpg" Stretch="Fill"></Image>
+                        <Canvas x:Name="Depth">
+                            <Ellipse  Width="50" Height="50"  Opacity="0.4 " Fill="Orange" Name="DepthRight"></Ellipse>
+                            <Ellipse  Width="50" Height="50"  Opacity="0.4" Fill="Orange" Name="DepthLeft"></Ellipse>
+                        </Canvas>
+                    </Grid>
+
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
@@ -169,11 +185,11 @@
                     </Grid>
 
                 </Grid>
-             
+
             </Border>
             <Border  Grid.Row="1" BorderThickness="4,2,4,2" BorderBrush="Black">
                 <Grid>
-                    <Image  Source="./Assets/Images/NoImage.jpg" Stretch="Fill"></Image>
+                    <Image Name ="ColorImage"  Source="./Assets/Images/NoImage.jpg" Stretch="Fill"></Image>
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
@@ -207,7 +223,11 @@
             </Border>
             <Border Grid.Row="3" BorderThickness="4,2,4,2" BorderBrush="Black">
                 <Grid>
-                    <Image  Source="./Assets/Images/NoImage.jpg" Stretch="Fill"></Image>
+                    <Grid>
+                        <Image  Source="./Assets/Images/NoImage.jpg" Stretch="Fill"></Image>
+
+                    </Grid>
+
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
@@ -219,13 +239,21 @@
                         </Grid.ColumnDefinitions >
                         <Button Background="Aqua" Grid.Column="0" Grid.Row="0">Swap</Button>
                     </Grid>
-                  
+
                 </Grid>
-          
-  
+
+
             </Border>
             <Border   Grid.Row="4" BorderThickness="4,2,4,4" BorderBrush="Black">
-                <Label  Name="Data" Content="DATA" Foreground="#FFE60B0B"> </Label>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="3*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" Name="Data" Content="DATA" Foreground="#FFE60B0B"></Label>
+                    <CheckBox Grid.Row="1"  Style="{StaticResource SquareCheckBox}" Content="Seated Mode" Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0 10 10 10" Name="checkBoxSeatedMode" Checked="CheckBoxSeatedModeChanged" Unchecked="CheckBoxSeatedModeChanged"/>
+                </Grid>
+
             </Border>
         </Grid>
         <!--#endregion-->
