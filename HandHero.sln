@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32228.430
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HandHero", "HandHero\HandHero.csproj", "{DA972C9C-11B1-41E9-9BE8-D26907CA6786}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HandHero", "HandHero.csproj", "{0C0D535E-0798-480F-8503-5E066358F595}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{DA972C9C-11B1-41E9-9BE8-D26907CA6786}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DA972C9C-11B1-41E9-9BE8-D26907CA6786}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DA972C9C-11B1-41E9-9BE8-D26907CA6786}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DA972C9C-11B1-41E9-9BE8-D26907CA6786}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C0D535E-0798-480F-8503-5E066358F595}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C0D535E-0798-480F-8503-5E066358F595}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C0D535E-0798-480F-8503-5E066358F595}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C0D535E-0798-480F-8503-5E066358F595}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {EF994505-235C-435C-B765-E841F6CFA054}
+		SolutionGuid = {CB6A4995-FD13-415D-A7FF-5CB84962C80D}
 	EndGlobalSection
 EndGlobal

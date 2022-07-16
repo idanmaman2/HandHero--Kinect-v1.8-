@@ -87,20 +87,6 @@ namespace HandHero
         /// </summary>
         private DrawingImage imageSource;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         [DllImport("kernel32.dll", SetLastError = true)]
         static extern bool Beep(uint dwFreq, uint dwDuration);
         private readonly Border[] tagToBox;
@@ -144,6 +130,56 @@ namespace HandHero
         /// Intermediate storage for the color data received from the camera
         /// </summary>
         private byte[] colorPixels;
+
+
+        public MainWindow()
+        {
+            InitializeComponent();
+            tagToBox = new Border[5] { RedBox, BlueBox, GreenBox, YellowBox, PinkBox };
+            #region TableReset 
+            for (int i = 0; i < TableRows; i++)
+            {
+
+                for (int k = 0; k < NumberOfColors; k++)
+                {
+                    for (int j = 0; j < TableCols / NumberOfColors; j++)
+                    {
+
+                        Border brd = new Border();
+                        brd.BorderThickness = new Thickness(1);
+                        brd.BorderBrush = colors[k];
+                        brd.Tag = k;
+                        brd.MouseMove += (sender, e) => {
+                            Border BSender = (Border)sender;
+                            BSender.Background = Brushes.Orange;
+                            if (lastBorder is UIElement)
+                            {
+                                lastBorder.Background = null;
+                                tagToBox[(int)lastBorder.Tag].Background = colors[(int)lastBorder.Tag];
+                            }
+                            this.lastBorder = BSender;
+                            tagToBox[(int)BSender.Tag].Background = Brushes.GhostWhite;
+                            this.currentBeamIndex1 = this.currentBeamIndex2 = (uint)((int)BSender.Tag);
+
+                        };
+                        TableArray[i, k * (TableCols / NumberOfColors) + j] = brd;
+
+
+
+                    }
+
+                }
+
+            }
+            #endregion
+
+  
+
+
+
+        }
+
+
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
         {
@@ -248,8 +284,32 @@ namespace HandHero
 
             if (null == this.sensor)
             {
-                this.Data.Content = "Kinect is not ready ";
+               MessageBox.Show("Kinect is not ready ");
             }
+
+            #region EnemyTimer 
+            DispatcherTimer timerCreation = new DispatcherTimer();
+            timerCreation.Interval = TimeSpan.FromSeconds(0.3);
+            timerCreation.Tick += EnemyCreation;
+            timerCreation.Start();
+
+            DispatcherTimer timerUpdate = new DispatcherTimer();
+            timerUpdate.Interval = TimeSpan.FromSeconds(0.03);
+            timerUpdate.Tick += EnemyMovementUpdate;
+            timerUpdate.Start();
+            #endregion
+
+            #region LedTimer
+
+            DispatcherTimer timerUpdateLed = new DispatcherTimer();
+            timerUpdateLed.Interval = TimeSpan.FromSeconds(0.03);
+            timerUpdateLed.Tick += EnemyMovementUpdate;
+            //timerUpdateLed.Start();
+            #endregion
+
+            Table.Children.Add(new CostumTable(TableRows, TableCols, TableArray));
+
+
         }
 
         /// <summary>
@@ -344,62 +404,7 @@ namespace HandHero
             }
         }
 
-
-        public MainWindow()
-        {
-            InitializeComponent();
-            tagToBox = new Border[5] { RedBox, BlueBox, GreenBox, YellowBox, PinkBox };
-            #region TableReset 
-            for (int i = 0; i < TableRows; i++)
-            {
-
-                for (int k = 0; k < NumberOfColors; k++)
-                {
-                    for (int j = 0; j < TableCols / NumberOfColors; j++)
-                    {
-
-                        Border brd = new Border();
-                        brd.BorderThickness = new Thickness(1);
-                        brd.BorderBrush = colors[k];
-                        brd.Tag = k;
-                        brd.MouseMove += (sender, e) => {
-                            Border BSender = (Border)sender;
-                            BSender.Background = Brushes.Orange;
-                            if (lastBorder is UIElement)
-                            {
-                                lastBorder.Background = null;
-                                tagToBox[(int)lastBorder.Tag].Background = colors[(int)lastBorder.Tag];
-                            }
-                            this.lastBorder = BSender;
-                            tagToBox[(int)BSender.Tag].Background = Brushes.GhostWhite;
-                            this.currentBeamIndex1 = this.currentBeamIndex2 = (uint)((int)BSender.Tag);
-
-                        };
-                        TableArray[i, k * (TableCols / NumberOfColors) + j] = brd;
-
-
-
-                    }
-
-                }
-
-            }
-            #endregion
-
-            #region EnemyTimer 
-            DispatcherTimer timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(0.03);
-            timer.Tick += EnemyCreation;
-            timer.Start();
-            #endregion
-
-            Table.Children.Add(new CostumTable(TableRows, TableCols, TableArray));
-
-
-
-        }
-
-        private void SensorColorFrameReady(object sender, ColorImageFrameReadyEventArgs e)
+           private void SensorColorFrameReady(object sender, ColorImageFrameReadyEventArgs e)
         {
             using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
             {
@@ -467,7 +472,6 @@ namespace HandHero
             }
         }
 
-
         private static void RenderClippedEdges(Skeleton skeleton, DrawingContext drawingContext)
         {
             if (skeleton.ClippedEdges.HasFlag(FrameEdges.Bottom))
@@ -503,7 +507,6 @@ namespace HandHero
             }
         }
 
-
         /// <summary>
         /// Draws a skeleton's bones and joints
         /// </summary>
@@ -525,9 +528,6 @@ namespace HandHero
                
         
         }
-
-
-
 
         Brush handColRowDetect(Point pos , ref uint prm ) {
 
@@ -633,6 +633,7 @@ namespace HandHero
 
         void EnemyCreation(object sender, EventArgs e)
         {
+            Mouse2.Fill = Brushes.Gray; 
             int chance = rndGen.Next(10);
             double width = MainGameView.ActualWidth, height = MainGameView.ActualHeight;
             if (chance % 10 == 0)
@@ -647,7 +648,7 @@ namespace HandHero
                     beamOfEnemy = rndGen.Next(5);
                 } while (false);
                 
-                Data.Content = beamOfEnemy;
+               Data.Content = beamOfEnemy;
 
                Rectangle enemy = new Rectangle();
                enemy.Width = width / MainWindow.NumberOfColors;
@@ -664,6 +665,13 @@ namespace HandHero
                 enemies.Add(enemy);
             }
 
+ 
+
+          
+        }
+
+        void EnemyMovementUpdate(object sender, EventArgs e) {
+            double width = MainGameView.ActualWidth, height = MainGameView.ActualHeight;
             for (int i = 0; i < enemies.Count; i++)
             {
                 var enemyToMove = enemies[i];
@@ -677,7 +685,7 @@ namespace HandHero
                     if (currentBeamIndex1 == (int)enemyToMove.Tag || currentBeamIndex2 == (int)enemyToMove.Tag)
                     {
                         tagToBox[(int)enemyToMove.Tag].Background = Brushes.LawnGreen;
-                        Mouse2.Fill = Brushes.LawnGreen; 
+                        Mouse2.Fill = Brushes.LawnGreen;
                         shots++;
 
                     }
@@ -691,11 +699,8 @@ namespace HandHero
                 }
             }
             enemies = enemies.FindAll(z => !(z is null));
-
-           // Data.Content = shots + @"\" + (misses + shots);
             Rate.Value = (int)(((float)shots) / (misses + shots) * 100);
         }
-
 
     }
 }

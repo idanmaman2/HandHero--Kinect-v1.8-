@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:HandHero"
         xmlns:convert="clr-namespace:HandHero.Converters" xmlns:widgets="clr-namespace:Microsoft.Samples.Kinect.DepthBasics.Widgets"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1000" Width="1000" 
+        Title="Hand Hero Alaphj 0.001A " Height="1000" Width="1000" 
         Background="#FF292828"
          Loaded="WindowLoaded" Closing="WindowClosing">
 
